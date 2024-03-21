@@ -30,6 +30,6 @@ return new class extends Migration
      */
     public function down(): void
     {
-        Schema::dropIfExists('user_marketplace_accounts');
+        Schema::dropIfExists('user_marketplaces_accounts');
     }
 };
