@@ -2,7 +2,8 @@
 
 namespace App\Http\Services;
 
-use App\Models\UserMarketplacesAccounts;
+use App\Models\AmazonAdvertise;
+use App\Models\UserMarketplaceAccount;
 use Illuminate\Support\Facades\Crypt;
 use Illuminate\Support\Facades\Http;
 use SellingPartnerApi\Api\ReportsV20210630Api;
@@ -14,7 +15,7 @@ use SellingPartnerApi\ReportType;
 
 class AmazonService
 {
-    public function __construct(private UserMarketplacesAccounts $account)
+    public function __construct(private UserMarketplaceAccount $account)
     {
     }
 
@@ -34,7 +35,12 @@ class AmazonService
         ]);
     }
 
-    public function getAdvertises()
+    /**
+     * Retrieve an array of AmazonAdvertise objects.
+     *
+     * @return AmazonAdvertise[]
+     */
+    public function getAdvertises(): array
     {
         $this->checkToken();
 
@@ -60,7 +66,7 @@ class AmazonService
                     }
 
                     if ($requestedReport['processing_status'] != 'DONE') {
-                        return false;
+                        return [];
                     }
 
                     $documentId = $requestedReport['report_document_id'];
@@ -79,7 +85,7 @@ class AmazonService
                             continue;
                         }
 
-                        $advertises[($advertise['seller-sku'] ?? $advertise['sku-do-vendedor'])] = [
+                        $advertises[($advertise['seller-sku'] ?? $advertise['sku-do-vendedor'])] = new AmazonAdvertise([
                             'item_id' => $advertise['asin1'] ?? $advertise['asin 1'],
                             'external_sku' => $advertise['seller-sku'] ?? $advertise['sku-do-vendedor'],
                             'title' => $advertise['item-name'] ?? $advertise['nome-do-item'],
@@ -91,7 +97,7 @@ class AmazonService
                             'sold_quantity' => null,
                             'visits' => null,
                             'account_id' => $this->account->id,
-                        ];
+                        ]);
                     }
 
                     return $advertises;
@@ -114,7 +120,7 @@ class AmazonService
                             continue;
                         }
 
-                        $advertises[($advertise['seller-sku'] ?? $advertise['sku-do-vendedor'])] = [
+                        $advertises[($advertise['seller-sku'] ?? $advertise['sku-do-vendedor'])] = new AmazonAdvertise([
                             'item_id' => $advertise['asin1'] ?? $advertise['asin 1'],
                             'external_sku' => $advertise['seller-sku'] ?? $advertise['sku-do-vendedor'],
                             'title' => $advertise['item-name'] ?? $advertise['nome-do-item'],
@@ -126,7 +132,7 @@ class AmazonService
                             'sold_quantity' => null,
                             'visits' => null,
                             'account_id' => $this->account->id,
-                        ];
+                        ]);
                     }
 
                     return $advertises;
@@ -154,7 +160,7 @@ class AmazonService
         }
 
         if ($report['processing_status'] != 'DONE') {
-            return false;
+            return [];
         }
 
         $documentId = $report['report_document_id'];
@@ -173,7 +179,7 @@ class AmazonService
                 continue;
             }
 
-            $advertises[($advertise['seller-sku'] ?? $advertise['sku-do-vendedor'])] = [
+            $advertises[($advertise['seller-sku'] ?? $advertise['sku-do-vendedor'])] = new AmazonAdvertise([
                 'item_id' => $advertise['asin1'] ?? $advertise['asin 1'],
                 'external_sku' => $advertise['seller-sku'] ?? $advertise['sku-do-vendedor'],
                 'title' => $advertise['item-name'] ?? $advertise['nome-do-item'],
@@ -186,7 +192,7 @@ class AmazonService
                 'visits' => null,
                 'account_id' => $this->account->id,
 
-            ];
+            ]);
         }
 
         return $advertises;
