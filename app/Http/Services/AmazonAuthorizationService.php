@@ -2,6 +2,7 @@
 
 namespace App\Http\Services;
 
+use App\Jobs\GetAmazonAdvertises;
 use App\Models\UserMarketplaceAccount;
 use Illuminate\Support\Facades\Crypt;
 use Illuminate\Support\Facades\Http;
@@ -33,6 +34,8 @@ class AmazonAuthorizationService
             'refresh_token' => $codeToToken['refresh_token'],
             'expiration_time' => date('Y-m-d H:i:s', $expirationTimeUnix),
         ]);
+
+        GetAmazonAdvertises::dispatch(new AmazonService($userAmazonAccount));
 
         return $userAmazonAccount;
     }
