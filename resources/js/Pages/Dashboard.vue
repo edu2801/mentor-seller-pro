@@ -1,6 +1,66 @@
 <script setup>
 import AuthenticatedLayout from '@/Layouts/AuthenticatedLayout.vue';
 import { Head } from '@inertiajs/vue3';
+import { ref, watch } from 'vue';
+
+const advertises = ref([
+    {
+        thumbnail: "https://m.media-amazon.com/images/I/71mtzzvom3S._AC_SX679_.jpg",
+        title: "Aspirador de pó",
+        sku: "LC-0123",
+        status: "ativo",
+        grade: 0.782
+    },
+    {
+        thumbnail: "https://m.media-amazon.com/images/I/71mtzzvom3S._AC_SX679_.jpg",
+        title: "Fone de ouvido",
+        sku: "LC-0623",
+        status: "Inativo",
+        grade: 0.7634
+    },
+    {
+        thumbnail: "https://m.media-amazon.com/images/I/71mtzzvom3S._AC_SX679_.jpg",
+        title: "Notebook Dell",
+        sku: "LC-0983",
+        status: "ativo",
+        grade: 0.23674
+    }
+])
+const headers = [
+    { title: 'Anúncio', key: 'title' },
+    { title: 'Status', key: 'status' },
+    {
+        title: 'Nota',
+        key: 'grade',
+        value: advertise => advertise.grade.toLocaleString('pt-br', { style: 'percent', minimumFractionDigits: 2, maximumFractionDigits: 2 }),
+    },
+    { title: 'Ações', key: 'actions', align: 'end' }
+]
+
+const search = ref('')
+
+const filteredAdvertises = ref([]);
+
+watch(search, () => {
+    if (!search.value) {
+        filteredAdvertises.value = advertises.value;
+        return;
+    }
+
+    const searchTerm = search.value.toLowerCase();
+    filteredAdvertises.value = advertises.value.filter(ad => {
+        return Object.values(ad).some(val => {
+            if (typeof val === 'string' || val instanceof String) {
+                return val.toLowerCase().includes(searchTerm);
+            }
+
+            if (typeof val === 'number' || val instanceof Number) {
+                return val.toString().toLowerCase().includes(searchTerm);
+            }
+            return false;
+        });
+    });
+}, { immediate: true });
 </script>
 
 <template>
@@ -27,11 +87,8 @@ import { Head } from '@inertiajs/vue3';
                 <div class="flex flex-col justify-start">
                     <p class="my-4 text-4xl font-bold text-left text-gray-700">
                         34,500
-                        <span class="text-sm">
-                            $
-                        </span>
                     </p>
-                    <div class="flex items-center text-sm text-green-500">
+                    <!-- <div class="flex items-center text-sm text-green-500">
                         <svg width="20" height="20" fill="currentColor" viewBox="0 0 1792 1792"
                             xmlns="http://www.w3.org/2000/svg">
                             <path
@@ -44,7 +101,7 @@ import { Head } from '@inertiajs/vue3';
                         <span class="text-gray-400">
                             vs last month
                         </span>
-                    </div>
+                    </div> -->
                 </div>
             </div>
 
@@ -66,302 +123,51 @@ import { Head } from '@inertiajs/vue3';
                 <div class="flex flex-col justify-start">
                     <p class="my-4 text-4xl font-bold text-left text-gray-700">
                         34,500
-                        <span class="text-sm">
-                            $
-                        </span>
                     </p>
-                    <div class="flex items-center text-sm text-green-500">
-                        <svg width="20" height="20" fill="currentColor" viewBox="0 0 1792 1792"
-                            xmlns="http://www.w3.org/2000/svg">
-                            <path
-                                d="M1408 1216q0 26-19 45t-45 19h-896q-26 0-45-19t-19-45 19-45l448-448q19-19 45-19t45 19l448 448q19 19 19 45z">
-                            </path>
-                        </svg>
-                        <span>
-                            5.5%
-                        </span>
-                        <span class="text-gray-400">
-                            vs last month
-                        </span>
-                    </div>
                 </div>
             </div>
         </div>
 
+        <div class="mt-10 mx-10">
+            <v-card flat>
+                <v-card-title class="d-flex align-center pe-2">
+                    Anúncios
+                    <v-spacer></v-spacer>
+                    <v-text-field v-model="search" density="compact" label="Pesquisa" prepend-inner-icon="mdi-magnify"
+                        variant="solo-filled" flat hide-details single-line></v-text-field>
+                </v-card-title>
 
-
-        <div class="container max-w-3xl px-4 mx-auto sm:px-8">
-            <div class="py-8">
-                <div class="flex flex-row justify-between w-full mb-1 sm:mb-0">
-                    <h2 class="text-2xl leading-tight">
-                        Anúncios
-                    </h2>
-                    <div class="text-end">
-                        <form
-                            class="flex flex-col justify-center w-3/4 max-w-sm space-y-3 md:flex-row md:w-full md:space-x-3 md:space-y-0">
-                            <div class=" relative ">
-                                <input type="text" id="&quot;form-subscribe-Filter"
-                                    class=" rounded-lg border-transparent flex-1 appearance-none border border-gray-300 w-full py-2 px-4 bg-white text-gray-700 placeholder-gray-400 shadow-sm text-base focus:outline-none focus:ring-2 focus:ring-purple-600 focus:border-transparent"
-                                    placeholder="título" />
+                <v-divider></v-divider>
+                <v-data-table :items="filteredAdvertises" :headers="headers">
+                    <template v-slot:item.title="{ item }">
+                        <div class="flex items-center ms-5">
+                            <div class="flex-shrink-0">
+                                <a href="#" class="relative block">
+                                    <img alt="profil" :src="item.thumbnail"
+                                        class="mx-auto object-cover rounded-full h-10 w-10 border-gray-300 border-2" />
+                                </a>
                             </div>
-                            <button
-                                class="flex-shrink-0 px-4 py-2 text-base font-semibold text-white bg-orange-600 rounded-lg shadow-md hover:bg-orange-700 focus:outline-none focus:ring-2 focus:ring-purple-500 focus:ring-offset-2 focus:ring-offset-purple-200"
-                                type="submit">
-                                Filtrar
-                            </button>
-                        </form>
-                    </div>
-                </div>
-                <div class="px-4 py-4 -mx-4 overflow-x-auto sm:-mx-8 sm:px-8">
-                    <div class="inline-block min-w-full overflow-hidden rounded-lg shadow">
-                        <table class="min-w-full leading-normal">
-                            <thead>
-                                <tr>
-                                    <th scope="col"
-                                        class="px-5 py-3 text-sm font-normal text-left text-gray-800 uppercase bg-white border-b border-gray-200">
-                                        User
-                                    </th>
-                                    <th scope="col"
-                                        class="px-5 py-3 text-sm font-normal text-left text-gray-800 uppercase bg-white border-b border-gray-200">
-                                        Role
-                                    </th>
-                                    <th scope="col"
-                                        class="px-5 py-3 text-sm font-normal text-left text-gray-800 uppercase bg-white border-b border-gray-200">
-                                        Created at
-                                    </th>
-                                    <th scope="col"
-                                        class="px-5 py-3 text-sm font-normal text-left text-gray-800 uppercase bg-white border-b border-gray-200">
-                                        status
-                                    </th>
-                                    <th scope="col"
-                                        class="px-5 py-3 text-sm font-normal text-left text-gray-800 uppercase bg-white border-b border-gray-200">
-                                    </th>
-                                </tr>
-                            </thead>
-                            <tbody>
-                                <tr>
-                                    <td class="px-5 py-5 text-sm bg-white border-b border-gray-200">
-                                        <div class="flex items-center">
-                                            <div class="flex-shrink-0">
-                                                <a href="#" class="relative block">
-                                                    <img alt="profil" src="/images/person/8.jpg"
-                                                        class="mx-auto object-cover rounded-full h-10 w-10 " />
-                                                </a>
-                                            </div>
-                                            <div class="flex-1 ml-3">
-                                                <div class="font-medium ">
-                                                    Jean Marc
-                                                </div>
-                                                <div class="text-sm text-gray-600 ">
-                                                    Developer
-                                                </div>
-                                            </div>
-                                            <!-- <div class="ml-3">
-                                            <p class="text-gray-900 whitespace-no-wrap">
-                                                Jean marc
-                                            </p>
-                                        </div> -->
-                                        </div>
-                                    </td>
-                                    <td class="px-5 py-5 text-sm bg-white border-b border-gray-200">
-                                        <p class="text-gray-900 whitespace-no-wrap">
-                                            Admin
-                                        </p>
-                                    </td>
-                                    <td class="px-5 py-5 text-sm bg-white border-b border-gray-200">
-                                        <p class="text-gray-900 whitespace-no-wrap">
-                                            12/09/2020
-                                        </p>
-                                    </td>
-                                    <td class="px-5 py-5 text-sm bg-white border-b border-gray-200">
-                                        <span
-                                            class="relative inline-block px-3 py-1 font-semibold leading-tight text-green-900">
-                                            <span aria-hidden="true"
-                                                class="absolute inset-0 bg-green-200 rounded-full opacity-50">
-                                            </span>
-                                            <span class="relative">
-                                                active
-                                            </span>
-                                        </span>
-                                    </td>
-                                    <td class="px-5 py-5 text-sm bg-white border-b border-gray-200">
-                                        <a href="#" class="text-indigo-600 hover:text-indigo-900">
-                                            Edit
-                                        </a>
-                                    </td>
-                                </tr>
-                                <tr>
-                                    <td class="px-5 py-5 text-sm bg-white border-b border-gray-200">
-                                        <div class="flex items-center">
-                                            <div class="flex-shrink-0">
-                                                <a href="#" class="relative block">
-                                                    <img alt="profil" src="/images/person/9.jpg"
-                                                        class="mx-auto object-cover rounded-full h-10 w-10 " />
-                                                </a>
-                                            </div>
-                                            <div class="ml-3">
-                                                <p class="text-gray-900 whitespace-no-wrap">
-                                                    Marcus coco
-                                                </p>
-                                            </div>
-                                        </div>
-                                    </td>
-                                    <td class="px-5 py-5 text-sm bg-white border-b border-gray-200">
-                                        <p class="text-gray-900 whitespace-no-wrap">
-                                            Designer
-                                        </p>
-                                    </td>
-                                    <td class="px-5 py-5 text-sm bg-white border-b border-gray-200">
-                                        <p class="text-gray-900 whitespace-no-wrap">
-                                            01/10/2012
-                                        </p>
-                                    </td>
-                                    <td class="px-5 py-5 text-sm bg-white border-b border-gray-200">
-                                        <span
-                                            class="relative inline-block px-3 py-1 font-semibold leading-tight text-green-900">
-                                            <span aria-hidden="true"
-                                                class="absolute inset-0 bg-green-200 rounded-full opacity-50">
-                                            </span>
-                                            <span class="relative">
-                                                active
-                                            </span>
-                                        </span>
-                                    </td>
-                                    <td class="px-5 py-5 text-sm bg-white border-b border-gray-200">
-                                        <a href="#" class="text-indigo-600 hover:text-indigo-900">
-                                            Edit
-                                        </a>
-                                    </td>
-                                </tr>
-                                <tr>
-                                    <td class="px-5 py-5 text-sm bg-white border-b border-gray-200">
-                                        <div class="flex items-center">
-                                            <div class="flex-shrink-0">
-                                                <a href="#" class="relative block">
-                                                    <img alt="profil" src="/images/person/10.jpg"
-                                                        class="mx-auto object-cover rounded-full h-10 w-10 " />
-                                                </a>
-                                            </div>
-                                            <div class="ml-3">
-                                                <p class="text-gray-900 whitespace-no-wrap">
-                                                    Ecric marc
-                                                </p>
-                                            </div>
-                                        </div>
-                                    </td>
-                                    <td class="px-5 py-5 text-sm bg-white border-b border-gray-200">
-                                        <p class="text-gray-900 whitespace-no-wrap">
-                                            Developer
-                                        </p>
-                                    </td>
-                                    <td class="px-5 py-5 text-sm bg-white border-b border-gray-200">
-                                        <p class="text-gray-900 whitespace-no-wrap">
-                                            02/10/2018
-                                        </p>
-                                    </td>
-                                    <td class="px-5 py-5 text-sm bg-white border-b border-gray-200">
-                                        <span
-                                            class="relative inline-block px-3 py-1 font-semibold leading-tight text-green-900">
-                                            <span aria-hidden="true"
-                                                class="absolute inset-0 bg-green-200 rounded-full opacity-50">
-                                            </span>
-                                            <span class="relative">
-                                                active
-                                            </span>
-                                        </span>
-                                    </td>
-                                    <td class="px-5 py-5 text-sm bg-white border-b border-gray-200">
-                                        <a href="#" class="text-indigo-600 hover:text-indigo-900">
-                                            Edit
-                                        </a>
-                                    </td>
-                                </tr>
-                                <tr>
-                                    <td class="px-5 py-5 text-sm bg-white border-b border-gray-200">
-                                        <div class="flex items-center">
-                                            <div class="flex-shrink-0">
-                                                <a href="#" class="relative block">
-                                                    <img alt="profil" src="/images/person/6.jpg"
-                                                        class="mx-auto object-cover rounded-full h-10 w-10 " />
-                                                </a>
-                                            </div>
-                                            <div class="ml-3">
-                                                <p class="text-gray-900 whitespace-no-wrap">
-                                                    Julien Huger
-                                                </p>
-                                            </div>
-                                        </div>
-                                    </td>
-                                    <td class="px-5 py-5 text-sm bg-white border-b border-gray-200">
-                                        <p class="text-gray-900 whitespace-no-wrap">
-                                            User
-                                        </p>
-                                    </td>
-                                    <td class="px-5 py-5 text-sm bg-white border-b border-gray-200">
-                                        <p class="text-gray-900 whitespace-no-wrap">
-                                            23/09/2010
-                                        </p>
-                                    </td>
-                                    <td class="px-5 py-5 text-sm bg-white border-b border-gray-200">
-                                        <span
-                                            class="relative inline-block px-3 py-1 font-semibold leading-tight text-green-900">
-                                            <span aria-hidden="true"
-                                                class="absolute inset-0 bg-green-200 rounded-full opacity-50">
-                                            </span>
-                                            <span class="relative">
-                                                active
-                                            </span>
-                                        </span>
-                                    </td>
-                                    <td class="px-5 py-5 text-sm bg-white border-b border-gray-200">
-                                        <a href="#" class="text-indigo-600 hover:text-indigo-900">
-                                            Edit
-                                        </a>
-                                    </td>
-                                </tr>
-                            </tbody>
-                        </table>
-                        <div class="flex flex-col items-center px-5 py-5 bg-white xs:flex-row xs:justify-between">
-                            <div class="flex items-center">
-                                <button type="button"
-                                    class="w-full p-4 text-base text-gray-600 bg-white border rounded-l-xl hover:bg-gray-100">
-                                    <svg width="9" fill="currentColor" height="8" class="" viewBox="0 0 1792 1792"
-                                        xmlns="http://www.w3.org/2000/svg">
-                                        <path
-                                            d="M1427 301l-531 531 531 531q19 19 19 45t-19 45l-166 166q-19 19-45 19t-45-19l-742-742q-19-19-19-45t19-45l742-742q19-19 45-19t45 19l166 166q19 19 19 45t-19 45z">
-                                        </path>
-                                    </svg>
-                                </button>
-                                <button type="button"
-                                    class="w-full px-4 py-2 text-base text-indigo-500 bg-white border-t border-b hover:bg-gray-100 ">
-                                    1
-                                </button>
-                                <button type="button"
-                                    class="w-full px-4 py-2 text-base text-gray-600 bg-white border hover:bg-gray-100">
-                                    2
-                                </button>
-                                <button type="button"
-                                    class="w-full px-4 py-2 text-base text-gray-600 bg-white border-t border-b hover:bg-gray-100">
-                                    3
-                                </button>
-                                <button type="button"
-                                    class="w-full px-4 py-2 text-base text-gray-600 bg-white border hover:bg-gray-100">
-                                    4
-                                </button>
-                                <button type="button"
-                                    class="w-full p-4 text-base text-gray-600 bg-white border-t border-b border-r rounded-r-xl hover:bg-gray-100">
-                                    <svg width="9" fill="currentColor" height="8" class="" viewBox="0 0 1792 1792"
-                                        xmlns="http://www.w3.org/2000/svg">
-                                        <path
-                                            d="M1363 877l-742 742q-19 19-45 19t-45-19l-166-166q-19-19-19-45t19-45l531-531-531-531q-19-19-19-45t19-45l166-166q19-19 45-19t45 19l742 742q19 19 19 45t-19 45z">
-                                        </path>
-                                    </svg>
-                                </button>
+                            <div class="flex-1 ml-3">
+                                <div class="font-medium ">
+                                    {{ item.title }}
+                                </div>
+                                <div class="text-sm text-gray-600 ">
+                                    {{ item.sku }}
+                                </div>
                             </div>
                         </div>
-                    </div>
-                </div>
-            </div>
+                    </template>
+
+                    <template v-slot:item.status="{ item }">
+                        <v-chip :color="item.status == 'ativo' ? 'green' : 'red'" :text="item.status"
+                            class="text-uppercase" size="small" label></v-chip>
+                    </template>
+
+                    <template v-slot:item.actions="{ item }">
+                        <i class="fa-solid fa-chevron-right mr-5"></i>
+                    </template>
+                </v-data-table>
+            </v-card>
         </div>
 
     </AuthenticatedLayout>
