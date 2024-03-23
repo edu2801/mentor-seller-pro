@@ -13,6 +13,7 @@ class AmazonAdvertise extends Model
         'item_id',
         'external_sku',
         'title',
+        'status',
         'thumbnail',
         'variation',
         'parent_sku',
