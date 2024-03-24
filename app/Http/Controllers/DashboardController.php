@@ -4,8 +4,11 @@ namespace App\Http\Controllers;
 
 use App\Http\Services\AmazonService;
 use App\Models\AmazonAdvertise;
+use App\Models\User;
 use Illuminate\Http\Request;
 use Inertia\Inertia;
+
+use function PHPUnit\Framework\isNull;
 
 class DashboardController extends Controller
 {
@@ -21,9 +24,21 @@ class DashboardController extends Controller
         dd($request);
     }
 
-    public function index()
+    public function index(User $user = null)
     {
-        $advertises = AmazonAdvertise::whereAccountId(auth()->user()->accounts->pluck('id'))->get()->toArray();
+        $userAccountsIds = auth()->user()->accounts->pluck('id');
+
+        if (!is_null($user) && auth()->user()->role >= 1) {
+            $userAccountsIds = $user->accounts->pluck('id');
+        }
+
+        if ($userAccountsIds->isEmpty()) {
+            return Inertia::render('Dashboard', [
+                'advertises' => [],
+            ]);
+        }
+
+        $advertises = AmazonAdvertise::whereAccountId($userAccountsIds)->get()->toArray();
 
         return Inertia::render('Dashboard', [
             'advertises' => $advertises,

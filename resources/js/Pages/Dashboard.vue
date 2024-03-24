@@ -3,6 +3,9 @@ import AuthenticatedLayout from '@/Layouts/AuthenticatedLayout.vue';
 import { Head, Link } from '@inertiajs/vue3';
 import { ref, watch } from 'vue';
 
+const isMentor = route().current().includes('mentor.user.');
+const userId = route().params.user ?? null;
+
 const props = defineProps(['advertises']);
 
 const headers = [
@@ -44,9 +47,7 @@ watch(search, () => {
 </script>
 
 <template>
-
     <Head title="Dashboard" />
-
     <AuthenticatedLayout>
         <!-- <div class="mt-5 flex justify-center items-center">
             <div class="p-4 bg-white shadow-lg rounded-2xl mr-3">
@@ -145,7 +146,7 @@ watch(search, () => {
                     </template>
 
                     <template v-slot:item.actions="{ item }">
-                        <Link :href="route('advertise.show', item.id)" class=" mr-5">
+                        <Link :href="!isMentor ? route('advertise.show', item.id) : route('mentor.user.advertise.show', {user: userId, amazonAdvertise: item.id})" class=" mr-5">
                             <i class="fa-solid fa-chevron-right"></i>
                         </Link>
                     </template>

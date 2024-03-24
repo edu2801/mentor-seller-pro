@@ -60,4 +60,14 @@ class User extends Authenticatable
     {
         return $this->hasMany(UserMarketplaceAccount::class);
     }
+
+    /**
+     * Get the user tasks
+     *
+     * @return string
+     */
+    public function tasks()
+    {
+        return $this->hasMany(Task::class);
+    }
 }

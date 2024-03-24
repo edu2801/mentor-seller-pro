@@ -8,7 +8,9 @@ import ResponsiveNavLink from '@/Components/ResponsiveNavLink.vue';
 import { Link } from '@inertiajs/vue3';
 
 const showingNavigationDropdown = ref(false);
-</script>
+
+const isMentor = route().current().includes('mentor.user.');
+const userId = route().params.user ?? null;</script>
 
 <template>
     <div>
@@ -29,12 +31,12 @@ const showingNavigationDropdown = ref(false);
 
                             <!-- Navigation Links -->
                             <div class="hidden space-x-8 sm:-my-px sm:ms-10 sm:flex">
-                                <NavLink :href="route('dashboard')" :active="route().current('dashboard')">
+                                <NavLink :href="!isMentor ? route('dashboard') : route('mentor.user.dashboard', userId)" :active="route().current('dashboard') || route().current('mentor.user.dashboard')">
                                     Dashboard
                                 </NavLink>
                             </div>
                             <div class="hidden space-x-8 sm:-my-px sm:ms-10 sm:flex">
-                                <NavLink :href="route('accounts')" :active="route().current('accounts')">
+                                <NavLink :href="!isMentor ? route('accounts') : route('mentor.user.accounts', userId)" :active="route().current('accounts') || route().current('mentor.user.accounts')">
                                     Contas
                                 </NavLink>
                             </div>
@@ -136,6 +138,25 @@ const showingNavigationDropdown = ref(false);
                             <ResponsiveNavLink :href="route('logout')" method="post" as="button">
                                 Log Out
                             </ResponsiveNavLink>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- If is mentor show an alert -->
+                <div class="bg-yellow-50 border-l-4 border-yellow-400 p-4" v-if="isMentor">
+                    <div class="flex">
+                        <div class="flex-shrink-0">
+                            <svg class="h-5 w-5 text-yellow-400" fill="currentColor" viewBox="0 0 20 20">
+                                <path
+                                    fill-rule="evenodd"
+                                    d="M2 3c0-.55.45-1 1-1h14c.55 0 1 .45 1 1v14c0 .55-.45 1-1 1H3c-.55 0-1-.45-1-1V3zm2 0v14h14V3H4zm2 2h10c.55 0 1 .45 1 1v8c0 .55-.45 1-1 1H6c-.55 0-1-.45-1-1V6c0-.55.45-1 1-1zm1 2v6h8V8H7z"
+                                />
+                            </svg>
+                        </div>
+                        <div class="ms-3">
+                            <p class="text-sm text-yellow-700">
+                                Você está visualizando a conta de um mentorado. <Link :href="route('mentor.users')" class="font-medium underline">Clique aqui</Link> para voltar para a sua conta.
+                            </p>
                         </div>
                     </div>
                 </div>

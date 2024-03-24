@@ -12,7 +12,6 @@ use App\Http\Middleware\UserMiddleware;
 use Illuminate\Foundation\Application;
 use Illuminate\Support\Facades\Route;
 use Inertia\Inertia;
-use SebastianBergmann\CodeCoverage\Report\Html\Dashboard;
 
 Route::get('/wellcome', function () {
     return Inertia::render('Welcome', [
@@ -47,19 +46,30 @@ Route::middleware('auth')->group(function () {
         Route::delete('/', [ProfileController::class, 'destroy'])->name('profile.destroy');
     });
 
-    Route::middleware(MentorMiddleware::class)->group(function () {
+    Route::middleware(MentorMiddleware::class)->prefix('mentor')->group(function () {
         Route::prefix('users')->group(function () {
-            // Route::get('/', [RegisteredUserController::class, 'index'])->name('users');
             Route::get('/create', [RegisteredUserController::class, 'create'])->name('users.create');
-            Route::get('/{user}', [RegisteredUserController::class, 'show'])->name('users.show');
+            Route::get('/view/{user}', [RegisteredUserController::class, 'show'])->name('users.show');
             Route::post('/', [RegisteredUserController::class, 'store'])->name('users.store');
+
+            Route::prefix('/{user}')->group(function () {
+                Route::get('/', [DashboardController::class, 'index'])->name('mentor.user.dashboard');
+
+                Route::prefix('advertise')->group(function () {
+                    Route::get('/{amazonAdvertise}', [AdvertisesController::class, 'show'])->name('mentor.user.advertise.show');
+                    Route::get('/{amazonAdvertise}/sync', [AdvertisesController::class, 'sync'])->name('mentor.user.advertise.sync');
+                });
+
+                Route::prefix('accounts')->group(function () {
+                    Route::get('/', [AccountsController::class, 'index'])->name('mentor.user.accounts');
+                    Route::get('/sync/{account}', [AccountsController::class, 'sync'])->name('mentor.user.accounts.sync');
+                });
+            });
         });
 
-        Route::prefix('mentor')->group(function () {
-            Route::get('/', [MentorController::class, 'index'])->name('mentor.dashboard');
-            Route::get('/users', [MentorController::class, 'users'])->name('mentor.users');
-            Route::get('/{user}', [MentorController::class, 'show'])->name('mentor.show');
-        });
+        Route::get('/', [MentorController::class, 'index'])->name('mentor.dashboard');
+        Route::get('/users', [MentorController::class, 'users'])->name('mentor.users');
+        Route::get('/{user}', [MentorController::class, 'show'])->name('mentor.show');
     });
 
     Route::middleware(AdminMiddleware::class)->group(function () {
@@ -67,7 +77,6 @@ Route::middleware('auth')->group(function () {
             return ["sapo" => "sapo"];
         })->name('admin.dashboard');
     });
-
 });
 
 require __DIR__ . '/auth.php';

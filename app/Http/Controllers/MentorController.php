@@ -22,7 +22,9 @@ class MentorController extends Controller
     public function users()
     {
         return Inertia::render('Mentor/UsersMentor', [
-            'users' => User::where('manager_id', auth()->id())->get()->map->only(['id', 'name', 'email', 'created_at']),
+            'users' => User::where('manager_id', auth()->id())->with('accounts')->with('tasks', function($query) {
+                $query->where('completed', false);
+            })->get()->map->only(['id', 'name', 'email', 'accounts', 'tasks', 'created_at']),
         ]);
     }
 

@@ -20,12 +20,15 @@ const parsedBulletPoints = ref(JSON.parse(advertise.value.bullet_points));
 watch(() => advertise.bullet_points, (newValue) => {
     parsedBulletPoints.value = JSON.parse(newValue);
 });
+
+const isMentor = route().current().includes('mentor.user.');
+const userId = route().params.user ?? null;
 </script>
 
 <template>
     <AuthenticatedLayout>
         <div class="flex justify-end items-center mt-5 mx-10">
-            <Link :href="route('advertise.sync', advertise.id, )">
+            <Link :href="!isMentor ? route('advertise.sync', advertise.id) : route('mentor.user.advertise.sync', {amazonAdvertise: advertise.id, user: userId})">
                 <PrimaryButton>
                     <i class="fas fa-sync-alt mr-2"></i> Sincronizar
                 </PrimaryButton>

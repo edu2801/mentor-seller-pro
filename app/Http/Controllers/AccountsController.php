@@ -4,6 +4,7 @@ namespace App\Http\Controllers;
 
 use App\Http\Services\AmazonService;
 use App\Jobs\GetAmazonAdvertises;
+use App\Models\User;
 use App\Models\UserMarketplaceAccount;
 use Illuminate\Http\Request;
 use Inertia\Inertia;
@@ -13,9 +14,15 @@ class AccountsController extends Controller
     /**
      * Display a listing of the resource.
      */
-    public function index()
+    public function index(User $user = null)
     {
-        $accounts = UserMarketplaceAccount::select('id', 'name', 'seller_id', 'created_at')->whereUserId(auth()->id())->get()->toArray();
+        $userId = auth()->id();
+
+        if (!is_null($user) && auth()->user()->role >= 1) {
+            $userId = $user->id;
+        }
+
+        $accounts = UserMarketplaceAccount::select('id', 'name', 'seller_id', 'created_at')->whereUserId($userId)->get()->toArray();
         return Inertia::render('Accounts', ['accounts' => $accounts]);
     }
 

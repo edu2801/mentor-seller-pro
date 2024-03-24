@@ -8,7 +8,9 @@ const props = defineProps(['users']);
 const headers = [
     { title: 'Nome', key: 'name' },
     { title: 'Email', key: 'email' },
-    { title: 'Data', key: 'created_at', value: item => new Date(item.created_at).toLocaleString("pt-br") },
+    { title: 'Contas', key: 'accounts', value: item => item?.accounts?.length },
+    { title: 'Tarefas Pendentes', key: 'tasks', value: item => item?.tasks?.length },
+    { title: 'Data Início', key: 'created_at', value: item => new Date(item.created_at).toLocaleString("pt-br") },
     { title: 'Ações', key: 'actions' },
 ]
 
@@ -34,7 +36,14 @@ const headers = [
                     <v-spacer></v-spacer>
                 </v-card-title>
                 <v-divider></v-divider>
-                <v-data-table :items="props.users" :headers="headers"></v-data-table>
+                <v-data-table :items="props.users" :headers="headers">
+                    <template #item.actions="{ item }">
+                        <Link :href="route('mentor.user.dashboard', item.id)">
+                            <i class="fas fa-eye text-orange-500 cursor-pointer mr-2"></i>
+                        </Link>
+                        <i class="fas fa-edit text-orange-500 cursor-pointer mr-2"></i>
+                    </template>
+                </v-data-table>
             </v-card>
         </div>
     </MentorLayout>
