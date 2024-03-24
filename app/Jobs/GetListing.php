@@ -49,30 +49,30 @@ class GetListing implements ShouldQueue
         // 'sold_quantity',
         // 'visits',
         // 'account_id'
-        AmazonAdvertise::updateOrCreate(
-            [
-                'external_sku' => $listing['sku'],
-                'account_id' => $this->amazonService->account->id,
-            ],
-            [
-                'title' => $listing['attributes']['item_name'][0]->value ?? null,
-                'description' => $listing['attributes']['product_description'][0]->value ?? null,
-                //'bullet_points' => $listing['attributes']['bullet_points'] ?? null,
-                'keywords' => $listing['attributes']['generic_keyword'][0]->value ?? null,
-                // 'status' => $listing['attributes']['status'] ?? null,
-                'thumbnail' => $listing['attributes']['main_product_image_locator'][0]->media_location ?? null,
-                // 'variation' => $listing['attributes']['variation'] ?? null,
-                // 'parent_sku' => $listing['attributes']['parent_sku'] ?? null,
-                // 'permalink' => $listing['attributes']['product_url'] ?? null,
-                'price' => $listing['attributes']['purchasable_offer'][0]->our_price[0]->schedule[0]->value_with_tax ?? null,
-                // 'sold_quantity' => $listing['attributes']['sold_quantity'] ?? null,
-                // 'visits' => $listing['attributes']['visits'] ?? null,
-            ]
-        );
+            echo "começou a salvar  \n";
+            $advertise = AmazonAdvertise::where('external_sku', $listing['sku'])->where('account_id', $this->amazonService->account->id)->first();
 
-        $amazonAdvertise = AmazonAdvertise::where('external_sku', $this->sku)->where('account_id', $this->amazonService->account->id)->first();
+            if (!$advertise) {
+                $advertise = new AmazonAdvertise();
+            }
 
-        $amazonAdvertise->images()->delete();
+            $advertise->external_sku = $listing['sku'];
+            $advertise->account_id = $this->amazonService->account->id;
+            $advertise->title = $listing['attributes']['item_name'][0]->value ??  $listing['summaries'][0]['item_name'] ?? "--sem título--";
+            $advertise->description = $listing['attributes']['product_description'][0]->value ?? null;
+            $advertise->bullet_points = isset($listing['attributes']['bullet_point']) ? json_encode($listing['attributes']['bullet_point']) : null;
+            $advertise->keywords = $listing['attributes']['generic_keyword'][0]->value ?? null;
+            // $advertise->status = $listing['attributes']['status'] ?? null;
+            $advertise->thumbnail = $listing['attributes']['main_product_image_locator'][0]->media_location ?? null;
+            // $advertise->variation = $listing['attributes']['variation'] ?? null;
+            // $advertise->parent_sku = $listing['attributes']['parent_sku'] ?? null;
+            // $advertise->permalink = $listing['attributes']['product_url'] ?? null;
+            $advertise->price = $listing['attributes']['purchasable_offer'][0]->our_price[0]->schedule[0]->value_with_tax ?? null;
+            // $advertise->sold_quantity = $listing['attributes']['sold_quantity'] ?? null;
+            // $advertise->visits = $listing['attributes']['visits'] ?? null;
+            $advertise->save();
+ 
+        $advertise->images()->delete();
 
         for ($i = 1; $i < 10; $i++) {
             if (!isset($listing['attributes']['other_product_image_locator_' . $i])) {
@@ -80,11 +80,13 @@ class GetListing implements ShouldQueue
             }
             $imageDimention = getimagesize($listing['attributes']['other_product_image_locator_' . $i][0]->media_location);
             AmazonAdvertiseImage::create([
-                'amazon_advertise_id' => $amazonAdvertise->id,
+                'amazon_advertise_id' => $advertise->id,
                 'url' => $listing['attributes']['other_product_image_locator_' . $i][0]->media_location,
                 'width' => $imageDimention[0] ?? 0,
                 'height' => $imageDimention[1] ?? 0,
             ]);
         }
+
+        AmazonAdvertise::calcGrade($advertise);
     }
 }

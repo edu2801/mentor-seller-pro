@@ -14,7 +14,7 @@ class DashboardController extends Controller
         $service = new AmazonService(auth()->user()->accounts->first());
         // $request = $service->searchAdvertises(['L1-0416+_FBA']);
         // $request = $service->getListing('L1-0416');
-        $request = $service->getListing('L1-0009');
+        $request = $service->getListing('L1-0341+_FBA');
         // $request = $service->getAPlusContent('B0BR8K5J6W');
         // $request = $service->getAPlusContent('B0BZDQ4YJJ');
 

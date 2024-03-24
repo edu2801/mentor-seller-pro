@@ -28,13 +28,12 @@ class GetAPlusContent implements ShouldQueue
     public function handle(): void
     {
         $aplusContent = $this->amazonService->getAPlusContent($this->asin);
-
         if (empty($aplusContent['publish_record_list'])) {
             return;
         }
 
         foreach ($aplusContent['publish_record_list'] as $content) {
-            AmazonAdvertiseAPlus::updateOrCreate(
+            $AdvertiseAPlus = AmazonAdvertiseAPlus::updateOrCreate(
                 [
                     'amazon_advertises_item_id' => $content['asin'],
                     'content_reference_key' => $content['content_reference_key'],
@@ -43,6 +42,10 @@ class GetAPlusContent implements ShouldQueue
                     'content_type' => $content['content_type']->value,
                 ]
             );
+            
+            $AdvertiseAPlus->amazonAdvertises()->each(function ($advertise) {
+                $advertise::calcGrade($advertise);
+            });
         }
     }
 }

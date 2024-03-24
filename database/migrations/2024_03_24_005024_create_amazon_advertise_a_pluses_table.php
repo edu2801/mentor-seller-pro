@@ -13,7 +13,8 @@ return new class extends Migration
     {
         Schema::create('amazon_advertise_a_pluses', function (Blueprint $table) {
             $table->id();
-            $table->unsignedBigInteger('amazon_advertises_item_id');
+            // amazon_advertises_item_id string that references item_id (not unique) on amazon_advertises tablez
+            $table->string('amazon_advertises_item_id')->nullable()->index();
             $table->text('content_reference_key')->nullable();
             $table->string('content_type')->nullable();
             $table->timestamps();

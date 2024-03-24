@@ -10,8 +10,8 @@ const headers = [
     { title: 'Status', key: 'status' },
     {
         title: 'Nota',
-        key: 'grade',
-        value: item => item?.grade?.toLocaleString('pt-br', { style: 'percent', minimumFractionDigits: 2, maximumFractionDigits: 2 }),
+        key: 'geral_grade',
+        value: item => item?.geral_grade?.toLocaleString('pt-br', { style: 'percent', minimumFractionDigits: 2, maximumFractionDigits: 2 }),
     },
     { title: 'Ações', key: 'actions', align: 'end' }
 ]
