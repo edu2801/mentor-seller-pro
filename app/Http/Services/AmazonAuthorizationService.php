@@ -35,7 +35,7 @@ class AmazonAuthorizationService
             'expiration_time' => date('Y-m-d H:i:s', $expirationTimeUnix),
         ]);
 
-        GetAmazonAdvertises::dispatch(new AmazonService($userAmazonAccount));
+        GetAmazonAdvertises::dispatch(new AmazonService($userAmazonAccount))->onQueue('advertises_report');
 
         return $userAmazonAccount;
     }

@@ -6,6 +6,7 @@ use App\Models\AmazonAdvertise;
 use App\Models\UserMarketplaceAccount;
 use Illuminate\Support\Facades\Crypt;
 use Illuminate\Support\Facades\Http;
+use SellingPartnerApi\Api\CatalogItemsV20220401Api;
 use SellingPartnerApi\Api\ReportsV20210630Api;
 use SellingPartnerApi\Configuration;
 use SellingPartnerApi\Document;
@@ -81,14 +82,11 @@ class AmazonService
                     $advertises = [];
 
                     foreach ($reportData as $advertise) {
-                        if ($advertise['status'] == 'Incomplete' || $advertise['status'] == 'Inactive') {
-                            continue;
-                        }
-
-                        $advertises[($advertise['seller-sku'] ?? $advertise['sku-do-vendedor'])] = new AmazonAdvertise([
+                        $advertises[] = [
                             'item_id' => $advertise['asin1'] ?? $advertise['asin 1'],
                             'external_sku' => $advertise['seller-sku'] ?? $advertise['sku-do-vendedor'],
-                            'title' => $advertise['item-name'] ?? $advertise['nome-do-item'],
+                            'title' => $advertise['item-name'] ?? $advertise['nome-do-item'] ?? "--sem título--",
+                            'status' => $advertise['status'],
                             'thumbnail' => null,
                             'variation' => null,
                             'parent_sku' => null,
@@ -97,7 +95,7 @@ class AmazonService
                             'sold_quantity' => null,
                             'visits' => null,
                             'account_id' => $this->account->id,
-                        ]);
+                        ];
                     }
 
                     return $advertises;
@@ -116,14 +114,11 @@ class AmazonService
                     $advertises = [];
 
                     foreach ($reportData as $advertise) {
-                        if (!empty($advertise['status']) && ($advertise['status'] == 'Incomplete' || $advertise['status'] == 'Inactive')) {
-                            continue;
-                        }
-
-                        $advertises[($advertise['seller-sku'] ?? $advertise['sku-do-vendedor'])] = new AmazonAdvertise([
+                        $advertises[] = [
                             'item_id' => $advertise['asin1'] ?? $advertise['asin 1'],
                             'external_sku' => $advertise['seller-sku'] ?? $advertise['sku-do-vendedor'],
-                            'title' => $advertise['item-name'] ?? $advertise['nome-do-item'],
+                            'title' => $advertise['item-name'] ?? $advertise['nome-do-item'] ?? "--sem título--",
+                            'status' => $advertise['status'],
                             'thumbnail' => null,
                             'variation' => null,
                             'parent_sku' => null,
@@ -132,7 +127,7 @@ class AmazonService
                             'sold_quantity' => null,
                             'visits' => null,
                             'account_id' => $this->account->id,
-                        ]);
+                        ];
                     }
 
                     return $advertises;
@@ -175,14 +170,11 @@ class AmazonService
         $advertises = [];
 
         foreach ($reportData as $advertise) {
-            if (isset($advertise['status']) && ($advertise['status'] == 'Incomplete' || $advertise['status'] == 'Inactive')) {
-                continue;
-            }
-
-            $advertises[($advertise['seller-sku'] ?? $advertise['sku-do-vendedor'])] = new AmazonAdvertise([
+            $advertises[] = [
                 'item_id' => $advertise['asin1'] ?? $advertise['asin 1'],
                 'external_sku' => $advertise['seller-sku'] ?? $advertise['sku-do-vendedor'],
-                'title' => $advertise['item-name'] ?? $advertise['nome-do-item'],
+                'title' => $advertise['item-name'] ?? $advertise['nome-do-item'] ?? "--sem título--",
+                'status' => $advertise['status'],
                 'thumbnail' => null,
                 'variation' => null,
                 'parent_sku' => null,
@@ -191,11 +183,26 @@ class AmazonService
                 'sold_quantity' => null,
                 'visits' => null,
                 'account_id' => $this->account->id,
-
-            ]);
+            ];
         }
 
         return $advertises;
+    }
+
+    public function searchAdvertises($asins, $identifier = 'SKU')
+    {
+        if (count($asins) > 20) {
+            new \Exception('The maximum number of ASINs is 20');
+        }
+
+        $this->checkToken();
+
+        $sellerId = $identifier == 'SKU' ? $this->account->seller_id : null;
+
+        $sdk = new CatalogItemsV20220401Api(self::config());
+        $request = $sdk->searchCatalogItems([self::$mtkid], $asins, $identifier, ['images'], null, $sellerId, null, null, null, 20);
+
+        return $request['items'];
     }
 
     public function checkToken()

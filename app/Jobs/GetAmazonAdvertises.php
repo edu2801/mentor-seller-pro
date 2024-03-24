@@ -33,9 +33,8 @@ class GetAmazonAdvertises implements ShouldQueue
             $advertises,
             ['external_sku', 'account_id'],
             [
-                'external_sku',
                 'title',
-                'thumbnail',
+                'status',
                 'variation',
                 'parent_sku',
                 'permalink',
@@ -44,5 +43,19 @@ class GetAmazonAdvertises implements ShouldQueue
                 'visits',
             ]
         );
+
+        $accountId = $advertises[0]['account_id'];
+        $itemsIdWithoutThumbnail = AmazonAdvertise::select('item_id')->distinct()->whereNull('thumbnail')->whereAccountId($accountId)->pluck('item_id');
+        unset($advertises);
+
+        $count = count($itemsIdWithoutThumbnail);
+        for ($i = 0; $i < $count; $i = $i + 20) {
+            $itemsIdSlice = $itemsIdWithoutThumbnail->slice($i, 20)->toArray();
+            $advertises = $this->amazonService->searchAdvertises($itemsIdSlice, 'ASIN');
+
+            foreach ($advertises as $advertise) {
+                AmazonAdvertise::where('item_id', $advertise['asin'])->where('account_id', $accountId)->update(['thumbnail' => $advertise['images'][0]['images'][1]['link'] ?? null]);
+            }
+        }
     }
 }

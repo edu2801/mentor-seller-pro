@@ -3,36 +3,15 @@ import AuthenticatedLayout from '@/Layouts/AuthenticatedLayout.vue';
 import { Head } from '@inertiajs/vue3';
 import { ref, watch } from 'vue';
 
-const advertises = ref([
-    {
-        thumbnail: "https://m.media-amazon.com/images/I/71mtzzvom3S._AC_SX679_.jpg",
-        title: "Aspirador de pó",
-        sku: "LC-0123",
-        status: "ativo",
-        grade: 0.782
-    },
-    {
-        thumbnail: "https://m.media-amazon.com/images/I/71mtzzvom3S._AC_SX679_.jpg",
-        title: "Fone de ouvido",
-        sku: "LC-0623",
-        status: "Inativo",
-        grade: 0.7634
-    },
-    {
-        thumbnail: "https://m.media-amazon.com/images/I/71mtzzvom3S._AC_SX679_.jpg",
-        title: "Notebook Dell",
-        sku: "LC-0983",
-        status: "ativo",
-        grade: 0.23674
-    }
-])
+const props = defineProps(['advertises']);
+
 const headers = [
     { title: 'Anúncio', key: 'title' },
     { title: 'Status', key: 'status' },
     {
         title: 'Nota',
         key: 'grade',
-        value: advertise => advertise.grade.toLocaleString('pt-br', { style: 'percent', minimumFractionDigits: 2, maximumFractionDigits: 2 }),
+        value: item => item?.grade?.toLocaleString('pt-br', { style: 'percent', minimumFractionDigits: 2, maximumFractionDigits: 2 }),
     },
     { title: 'Ações', key: 'actions', align: 'end' }
 ]
@@ -43,12 +22,12 @@ const filteredAdvertises = ref([]);
 
 watch(search, () => {
     if (!search.value) {
-        filteredAdvertises.value = advertises.value;
+        filteredAdvertises.value = props.advertises;
         return;
     }
 
     const searchTerm = search.value.toLowerCase();
-    filteredAdvertises.value = advertises.value.filter(ad => {
+    filteredAdvertises.value = props.advertises.filter(ad => {
         return Object.values(ad).some(val => {
             if (typeof val === 'string' || val instanceof String) {
                 return val.toLowerCase().includes(searchTerm);
@@ -152,15 +131,16 @@ watch(search, () => {
                                     {{ item.title }}
                                 </div>
                                 <div class="text-sm text-gray-600 ">
-                                    {{ item.sku }}
+                                    {{ item.external_sku }}
                                 </div>
                             </div>
                         </div>
                     </template>
 
                     <template v-slot:item.status="{ item }">
-                        <v-chip :color="item.status == 'ativo' ? 'green' : 'red'" :text="item.status"
-                            class="text-uppercase" size="small" label></v-chip>
+                        <v-chip
+                            :color="item.status === 'Active' ? 'green' : (item.status === 'Incomplete' ? 'orange' : 'red')"
+                            :text="item.status" class="text-uppercase" size="small" label></v-chip>
                     </template>
 
                     <template v-slot:item.actions="{ item }">

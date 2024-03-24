@@ -49,4 +49,14 @@ class User extends Authenticatable
             'password' => 'hashed',
         ];
     }
+
+    /**
+     * Get the user accounts
+     *
+     * @return string
+     */
+    public function accounts()
+    {
+        return $this->hasMany(UserMarketplaceAccount::class);
+    }
 }

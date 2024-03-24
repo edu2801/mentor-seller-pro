@@ -2,6 +2,8 @@
 
 namespace App\Http\Controllers;
 
+use App\Http\Services\AmazonService;
+use App\Jobs\GetAmazonAdvertises;
 use App\Models\UserMarketplaceAccount;
 use Illuminate\Http\Request;
 use Inertia\Inertia;
@@ -13,8 +15,19 @@ class AccountsController extends Controller
      */
     public function index()
     {
-        $accounts = UserMarketplaceAccount::select('name', 'seller_id', 'created_at')->whereUserId(auth()->id())->get()->toArray();
+        $accounts = UserMarketplaceAccount::select('id', 'name', 'seller_id', 'created_at')->whereUserId(auth()->id())->get()->toArray();
         return Inertia::render('Accounts', ['accounts' => $accounts]);
+    }
+
+    /**
+     * Sync the account advertises.
+     */
+    public function sync(UserMarketplaceAccount $account)
+    {
+        $service = new AmazonService($account);
+        GetAmazonAdvertises::dispatch($service)->onQueue('advertises_report');
+
+        return response()->json(['message' => 'A conta e seus anúncios estão sendo sincronizados.']);
     }
 
     /**
