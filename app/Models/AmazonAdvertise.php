@@ -50,7 +50,6 @@ class AmazonAdvertise extends Model
 
     public static function calcGrade($amazonAdvertise)
     {
-        echo "Calculando grade do anúncio: " . $amazonAdvertise->external_sku . "\n";
         $titleGrade = 0;
         $titleGradeMessage = [];
         $descriptionGrade = 0;
@@ -178,7 +177,9 @@ class AmazonAdvertise extends Model
 
         $geralGrade = ($titleGrade + $descriptionGrade + $bulletPointsGrade + $keyworkdsGrade + $imagesGrade + $aPlusContentGrade) / 6;
         $amazonAdvertise->geral_grade = $geralGrade;
-        $amazonAdvertise->save();
+        $amazonAdvertise->update();
+
+        $amazonAdvertise->grades()->delete();
 
         $grade = new AmazonAdvertiseGrade();
         $grade->amazon_advertises_id = $amazonAdvertise->id;

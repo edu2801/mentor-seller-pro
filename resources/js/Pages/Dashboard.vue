@@ -1,6 +1,6 @@
 <script setup>
 import AuthenticatedLayout from '@/Layouts/AuthenticatedLayout.vue';
-import { Head } from '@inertiajs/vue3';
+import { Head, Link } from '@inertiajs/vue3';
 import { ref, watch } from 'vue';
 
 const props = defineProps(['advertises']);
@@ -13,6 +13,7 @@ const headers = [
         key: 'geral_grade',
         value: item => item?.geral_grade?.toLocaleString('pt-br', { style: 'percent', minimumFractionDigits: 2, maximumFractionDigits: 2 }),
     },
+    { title: 'Atualização', key: 'updated_at', value: item => new Date(item?.updated_at).toLocaleString("pt-br")},
     { title: 'Ações', key: 'actions', align: 'end' }
 ]
 
@@ -47,7 +48,7 @@ watch(search, () => {
     <Head title="Dashboard" />
 
     <AuthenticatedLayout>
-        <div class="mt-5 flex justify-center items-center">
+        <!-- <div class="mt-5 flex justify-center items-center">
             <div class="p-4 bg-white shadow-lg rounded-2xl mr-3">
                 <div class="flex items-center">
                     <span class="relative p-4 bg-orange-200 rounded-xl">
@@ -67,7 +68,7 @@ watch(search, () => {
                     <p class="my-4 text-4xl font-bold text-left text-gray-700">
                         34,500
                     </p>
-                    <!-- <div class="flex items-center text-sm text-green-500">
+                    <div class="flex items-center text-sm text-green-500">
                         <svg width="20" height="20" fill="currentColor" viewBox="0 0 1792 1792"
                             xmlns="http://www.w3.org/2000/svg">
                             <path
@@ -80,7 +81,7 @@ watch(search, () => {
                         <span class="text-gray-400">
                             vs last month
                         </span>
-                    </div> -->
+                    </div>
                 </div>
             </div>
 
@@ -105,14 +106,14 @@ watch(search, () => {
                     </p>
                 </div>
             </div>
-        </div>
+        </div> -->
 
         <div class="mt-10 mx-10">
             <v-card flat>
                 <v-card-title class="d-flex align-center pe-2">
                     Anúncios
                     <v-spacer></v-spacer>
-                    <v-text-field v-model="search" density="compact" label="Pesquisa" prepend-inner-icon="mdi-magnify"
+                    <v-text-field v-model="search" density="compact" label="Pesquisa" prepend-inner-icon="fa-solid fa-search"
                         variant="solo-filled" flat hide-details single-line></v-text-field>
                 </v-card-title>
 
@@ -144,7 +145,9 @@ watch(search, () => {
                     </template>
 
                     <template v-slot:item.actions="{ item }">
-                        <i class="fa-solid fa-chevron-right mr-5"></i>
+                        <Link :href="route('advertise.show', item.id)" class=" mr-5">
+                            <i class="fa-solid fa-chevron-right"></i>
+                        </Link>
                     </template>
                 </v-data-table>
             </v-card>

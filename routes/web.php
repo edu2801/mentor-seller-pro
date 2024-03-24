@@ -1,6 +1,7 @@
 <?php
 
 use App\Http\Controllers\AccountsController;
+use App\Http\Controllers\AdvertisesController;
 use App\Http\Controllers\DashboardController;
 use App\Http\Controllers\ProfileController;
 use App\Http\Middleware\AdminMiddleware;
@@ -24,6 +25,11 @@ Route::get('/test', [DashboardController::class, 'test']);
 Route::middleware('auth')->group(function () {
 
     Route::get('/', [DashboardController::class, 'index'])->name('dashboard');
+
+    Route::prefix('advertise')->group(function () {
+        Route::get('/{amazonAdvertise}', [AdvertisesController::class, 'show'])->name('advertise.show');
+        Route::get('/{amazonAdvertise}/sync', [AdvertisesController::class, 'sync'])->name('advertise.sync');
+    });
 
     Route::prefix('accounts')->group(function () {
         Route::get('/', [AccountsController::class, 'index'])->name('accounts');
