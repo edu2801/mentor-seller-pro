@@ -47,7 +47,7 @@ class GetListing implements ShouldQueue
         $advertise->bullet_points = isset($listing['attributes']['bullet_point']) ? json_encode($listing['attributes']['bullet_point']) : null;
         $advertise->keywords = $listing['attributes']['generic_keyword'][0]->value ?? null;
         // $advertise->status = $listing['attributes']['status'] ?? null;
-        $advertise->thumbnail = $listing['attributes']['main_product_image_locator'][0]->media_location ?? null;
+        $advertise->thumbnail = $listing['attributes']['main_product_image_locator'][0]->media_location ?? $listing['summaries'][0]['main_image']['link'] ?? null;
         // $advertise->variation = $listing['attributes']['variation'] ?? null;
         // $advertise->parent_sku = $listing['attributes']['parent_sku'] ?? null;
         // $advertise->permalink = $listing['attributes']['product_url'] ?? null;
