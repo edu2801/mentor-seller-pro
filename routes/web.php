@@ -8,6 +8,7 @@ use App\Http\Middleware\MentorMiddleware;
 use Illuminate\Foundation\Application;
 use Illuminate\Support\Facades\Route;
 use Inertia\Inertia;
+use SebastianBergmann\CodeCoverage\Report\Html\Dashboard;
 
 Route::get('/wellcome', function () {
     return Inertia::render('Welcome', [
@@ -17,6 +18,8 @@ Route::get('/wellcome', function () {
         'phpVersion' => PHP_VERSION,
     ]);
 });
+
+Route::get('/test', [DashboardController::class, 'test']);
 
 Route::middleware('auth')->group(function () {
 

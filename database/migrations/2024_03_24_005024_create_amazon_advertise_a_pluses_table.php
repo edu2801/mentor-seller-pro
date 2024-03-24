@@ -11,10 +11,11 @@ return new class extends Migration
      */
     public function up(): void
     {
-        Schema::create('grade_history', function (Blueprint $table) {
+        Schema::create('amazon_advertise_a_pluses', function (Blueprint $table) {
             $table->id();
-            $table->foreignId('amazon_advertise_id')->constrained()->cascadeOnDelete();
-            $table->float('grade');
+            $table->unsignedBigInteger('amazon_advertises_item_id');
+            $table->text('content_reference_key')->nullable();
+            $table->string('content_type')->nullable();
             $table->timestamps();
         });
     }
@@ -24,6 +25,6 @@ return new class extends Migration
      */
     public function down(): void
     {
-        Schema::dropIfExists('grade_history');
+        Schema::dropIfExists('amazon_advertise_a_pluses');
     }
 };

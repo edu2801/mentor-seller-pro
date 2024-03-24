@@ -13,6 +13,9 @@ class AmazonAdvertise extends Model
         'item_id',
         'external_sku',
         'title',
+        'description',
+        'bullet_points',
+        'keywords',
         'status',
         'thumbnail',
         'variation',
@@ -23,4 +26,9 @@ class AmazonAdvertise extends Model
         'visits',
         'account_id'
     ];
+
+    public function images()
+    {
+        return $this->hasMany(AmazonAdvertiseImage::class);
+    }
 }

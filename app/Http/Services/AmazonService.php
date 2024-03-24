@@ -6,7 +6,9 @@ use App\Models\AmazonAdvertise;
 use App\Models\UserMarketplaceAccount;
 use Illuminate\Support\Facades\Crypt;
 use Illuminate\Support\Facades\Http;
+use SellingPartnerApi\Api\AplusContentV20201101Api;
 use SellingPartnerApi\Api\CatalogItemsV20220401Api;
+use SellingPartnerApi\Api\ListingsV20210801Api;
 use SellingPartnerApi\Api\ReportsV20210630Api;
 use SellingPartnerApi\Configuration;
 use SellingPartnerApi\Document;
@@ -16,7 +18,7 @@ use SellingPartnerApi\ReportType;
 
 class AmazonService
 {
-    public function __construct(private UserMarketplaceAccount $account)
+    public function __construct(public UserMarketplaceAccount $account)
     {
     }
 
@@ -35,6 +37,11 @@ class AmazonService
             "roleArn" => Crypt::decryptString(env('ROLE_ARN')),
         ]);
     }
+
+    // public function getAccount(): UserMarketplaceAccount
+    // {
+    //     return $this->account;
+    // }
 
     /**
      * Retrieve an array of AmazonAdvertise objects.
@@ -86,6 +93,7 @@ class AmazonService
                             'item_id' => $advertise['asin1'] ?? $advertise['asin 1'],
                             'external_sku' => $advertise['seller-sku'] ?? $advertise['sku-do-vendedor'],
                             'title' => $advertise['item-name'] ?? $advertise['nome-do-item'] ?? "--sem título--",
+                            'description' => $advertise['item-description'] ?? $advertise['descrição-do-item'] ?? null,
                             'status' => $advertise['status'],
                             'thumbnail' => null,
                             'variation' => null,
@@ -118,6 +126,7 @@ class AmazonService
                             'item_id' => $advertise['asin1'] ?? $advertise['asin 1'],
                             'external_sku' => $advertise['seller-sku'] ?? $advertise['sku-do-vendedor'],
                             'title' => $advertise['item-name'] ?? $advertise['nome-do-item'] ?? "--sem título--",
+                            'description' => $advertise['item-description'] ?? $advertise['descrição-do-item'] ?? null,
                             'status' => $advertise['status'],
                             'thumbnail' => null,
                             'variation' => null,
@@ -174,6 +183,7 @@ class AmazonService
                 'item_id' => $advertise['asin1'] ?? $advertise['asin 1'],
                 'external_sku' => $advertise['seller-sku'] ?? $advertise['sku-do-vendedor'],
                 'title' => $advertise['item-name'] ?? $advertise['nome-do-item'] ?? "--sem título--",
+                'description' => $advertise['item-description'] ?? $advertise['descrição-do-item'] ?? null,
                 'status' => $advertise['status'],
                 'thumbnail' => null,
                 'variation' => null,
@@ -200,9 +210,30 @@ class AmazonService
         $sellerId = $identifier == 'SKU' ? $this->account->seller_id : null;
 
         $sdk = new CatalogItemsV20220401Api(self::config());
-        $request = $sdk->searchCatalogItems([self::$mtkid], $asins, $identifier, ['images'], null, $sellerId, null, null, null, 20);
+        $request = $sdk->searchCatalogItems([self::$mtkid], $asins, $identifier, ['images', 'summaries', 'attributes'], null, $sellerId, null, null, null, 20);
 
         return $request['items'];
+    }
+
+    public function getListing($sku)
+    {
+        $this->checkToken();
+
+
+        $sdk = new ListingsV20210801Api(self::config());
+        $request = $sdk->getListingsItem($this->account->seller_id, $sku, self::$mtkid, null, ['summaries', 'attributes', 'issues', 'offers']);
+
+        return $request;
+    }
+
+    public function getAPlusContent($asin)
+    {
+        $this->checkToken();
+
+        $sdk = new AplusContentV20201101Api(self::config());
+        $request = $sdk->searchContentPublishRecords(self::$mtkid, $asin);
+
+        return $request;
     }
 
     public function checkToken()
