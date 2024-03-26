@@ -24,7 +24,12 @@ class Task extends Model
         parent::boot();
 
         static::creating(function ($task) {
-            $task->updated_by = Auth::user()->id;
+            $task->created_by = Auth::user()->id;
         });
+    }
+
+    public function advertise()
+    {
+        return $this->belongsTo(AmazonAdvertise::class, 'amazon_advertise_id');
     }
 }

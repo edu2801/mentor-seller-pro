@@ -48,6 +48,11 @@ class AmazonAdvertise extends Model
         return $this->hasMany(AmazonAdvertiseGrade::class, 'amazon_advertises_id', 'id');
     }
 
+    public function tasks()
+    {
+        return $this->hasMany(Task::class, 'amazon_advertise_id', 'id');
+    }
+
     public static function calcGrade($amazonAdvertise)
     {
         $titleGrade = 0;
@@ -67,25 +72,25 @@ class AmazonAdvertise extends Model
         $title = $amazonAdvertise->title;
         if (!empty($title)) {
             if (strlen($title) >= 25) {
-                $titleGrade += 0.25;
+                $titleGrade += 0.34;
             } else {
                 $titleGradeMessage[] = 'Título deve ter no mínimo 25 caracteres';
             }
 
             if (strlen($title) >= 50) {
-                $titleGrade += 0.25;
+                $titleGrade += 0.33;
             } else {
                 $titleGradeMessage[] = 'Para ficar melhor, o título deve ter no mínimo 50 caracteres';
             }
 
-            if (strlen($title) <= 70) {
-                $titleGrade += 0.25;
-            } else {
-                $titleGradeMessage[] = 'Para ficar melhor, o título deve ter no máximo 70 caracteres';
-            }
+            // if (strlen($title) <= 70) {
+            //     $titleGrade += 0.25;
+            // } else {
+            //     $titleGradeMessage[] = 'Para ficar melhor, o título deve ter no máximo 70 caracteres';
+            // }
 
             if (strlen($title) <= 200) {
-                $titleGrade += 0.25;
+                $titleGrade += 0.33;
             } else {
                 $titleGradeMessage[] = 'Título deve ter no máximo 200 caracteres';
             }

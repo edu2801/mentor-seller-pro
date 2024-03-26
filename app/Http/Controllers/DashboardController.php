@@ -38,7 +38,7 @@ class DashboardController extends Controller
             ]);
         }
 
-        $advertises = AmazonAdvertise::whereAccountId($userAccountsIds)->get()->toArray();
+        $advertises = AmazonAdvertise::whereAccountId($userAccountsIds)->with('tasks')->get()->toArray();
 
         return Inertia::render('Dashboard', [
             'advertises' => $advertises,

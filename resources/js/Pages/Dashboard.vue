@@ -16,7 +16,7 @@ const headers = [
         key: 'geral_grade',
         value: item => item?.geral_grade?.toLocaleString('pt-br', { style: 'percent', minimumFractionDigits: 2, maximumFractionDigits: 2 }),
     },
-    { title: 'Atualização', key: 'updated_at', value: item => new Date(item?.updated_at).toLocaleString("pt-br")},
+    { title: 'Atualização', key: 'updated_at', value: item => new Date(item?.updated_at).toLocaleString("pt-br") },
     { title: 'Ações', key: 'actions', align: 'end' }
 ]
 
@@ -47,6 +47,7 @@ watch(search, () => {
 </script>
 
 <template>
+
     <Head title="Dashboard" />
     <AuthenticatedLayout>
         <!-- <div class="mt-5 flex justify-center items-center">
@@ -109,13 +110,14 @@ watch(search, () => {
             </div>
         </div> -->
 
-        <div class="mt-10 mx-10">
+        <div class="mt-10 mx-15">
             <v-card flat>
                 <v-card-title class="d-flex align-center pe-2">
                     Anúncios
                     <v-spacer></v-spacer>
-                    <v-text-field v-model="search" density="compact" label="Pesquisa" prepend-inner-icon="fa-solid fa-search"
-                        variant="solo-filled" flat hide-details single-line></v-text-field>
+                    <v-text-field v-model="search" density="compact" label="Pesquisa"
+                        prepend-inner-icon="fa-solid fa-search" variant="solo-filled" flat hide-details
+                        single-line></v-text-field>
                 </v-card-title>
 
                 <v-divider></v-divider>
@@ -146,9 +148,18 @@ watch(search, () => {
                     </template>
 
                     <template v-slot:item.actions="{ item }">
-                        <Link :href="!isMentor ? route('advertise.show', item.id) : route('mentor.user.advertise.show', {user: userId, amazonAdvertise: item.id})" class=" mr-5">
+                        <div class="flex items-center justify-end">
+                            <Link v-if="!!item?.tasks.length" :href="!isMentor ? route('tasks', { advertise: item.id }) : route('mentor.user.tasks', { advertise: item.id, user: userId })"
+                            title="Tarefa"
+                                class="mr-5 text-orange-600">
+                            <i class="fa-solid fa-tasks"></i>
+                            </Link>
+                            <Link
+                                :href="!isMentor ? route('advertise.show', item.id) : route('mentor.user.advertise.show', { user: userId, amazonAdvertise: item.id })"
+                                class=" mr-5">
                             <i class="fa-solid fa-chevron-right"></i>
-                        </Link>
+                            </Link>
+                        </div>
                     </template>
                 </v-data-table>
             </v-card>

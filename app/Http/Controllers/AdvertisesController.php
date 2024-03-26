@@ -42,7 +42,7 @@ class AdvertisesController extends Controller
     public function show(User $user = null, AmazonAdvertise $amazonAdvertise)
     {
         return Inertia::render('Advertise/AdvertiseView', [
-            'advertise' => $amazonAdvertise->load('images')->load('grades')->toArray()
+            'advertise' => $amazonAdvertise->load('images')->load('grades')->load('tasks')->toArray()
         ]);
     }
 

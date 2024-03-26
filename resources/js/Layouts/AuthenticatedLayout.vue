@@ -40,6 +40,11 @@ const userId = route().params.user ?? null;</script>
                                     Contas
                                 </NavLink>
                             </div>
+                            <div class="hidden space-x-8 sm:-my-px sm:ms-10 sm:flex">
+                                <NavLink :href="!isMentor ? route('tasks') : route('mentor.user.tasks', userId)" :active="route().current('tasks') || route().current('mentor.user.tasks')">
+                                    Tarefas
+                                </NavLink>
+                            </div>
                         </div>
 
                         <div class="hidden sm:flex sm:items-center sm:ms-6">

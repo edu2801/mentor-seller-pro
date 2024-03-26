@@ -6,6 +6,7 @@ use App\Http\Controllers\Auth\RegisteredUserController;
 use App\Http\Controllers\DashboardController;
 use App\Http\Controllers\MentorController;
 use App\Http\Controllers\ProfileController;
+use App\Http\Controllers\TasksController;
 use App\Http\Middleware\AdminMiddleware;
 use App\Http\Middleware\MentorMiddleware;
 use App\Http\Middleware\UserMiddleware;
@@ -38,6 +39,15 @@ Route::middleware('auth')->group(function () {
             Route::get('/', [AccountsController::class, 'index'])->name('accounts');
             Route::get('/sync/{account}', [AccountsController::class, 'sync'])->name('accounts.sync');
         });
+
+        Route::prefix('tasks')->group(function () {
+            Route::get('/', [TasksController::class, 'index'])->name('tasks');
+            Route::post('/', [TasksController::class, 'store'])->name('tasks.store');
+            Route::get('/{task}', [TasksController::class, 'show'])->name('tasks.show');
+            Route::get('/{task}/edit', [TasksController::class, 'edit'])->name('tasks.edit');
+            Route::patch('/{task}', [TasksController::class, 'update'])->name('tasks.update');
+            Route::delete('/{task}', [TasksController::class, 'destroy'])->name('tasks.destroy');
+        });
     });
 
     Route::prefix('profile')->group(function () {
@@ -63,6 +73,15 @@ Route::middleware('auth')->group(function () {
                 Route::prefix('accounts')->group(function () {
                     Route::get('/', [AccountsController::class, 'index'])->name('mentor.user.accounts');
                     Route::get('/sync/{account}', [AccountsController::class, 'sync'])->name('mentor.user.accounts.sync');
+                });
+
+                Route::prefix('tasks')->group(function () {
+                    Route::get('/', [TasksController::class, 'index'])->name('mentor.user.tasks');
+                    Route::post('/', [TasksController::class, 'store'])->name('mentor.user.tasks.store');
+                    Route::get('/{task}', [TasksController::class, 'show'])->name('mentor.user.tasks.show');
+                    Route::get('/{task}/edit', [TasksController::class, 'edit'])->name('mentor.user.tasks.edit');
+                    Route::patch('/{task}', [TasksController::class, 'update'])->name('mentor.user.tasks.update');
+                    Route::delete('/{task}', [TasksController::class, 'destroy'])->name('mentor.user.tasks.destroy');
                 });
             });
         });
